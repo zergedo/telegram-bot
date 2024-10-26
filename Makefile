@@ -16,3 +16,10 @@ stop:
 ## Removes stopped service containers.
 clean:
 	@docker compose down --remove-orphans
+
+## Starts container for debug
+debug:
+	@docker compose -f docker-compose.debug.yml up -d --build
+
+stopdebug:
+	@docker compose -f docker-compose.debug.yml down --remove-orphans
