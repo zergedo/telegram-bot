@@ -53,6 +53,12 @@
 - https://docs.github.com/en/actions
 - https://docs.docker.com/reference/cli/docker/compose/
 
+# Документация по VSCode (Python, Docker)
+- https://code.visualstudio.com/docs/python/python-quick-start
+- https://code.visualstudio.com/docs/containers/quickstart-python
+- https://code.visualstudio.com/docs/containers/debug-python
+- https://code.visualstudio.com/docs/containers/docker-compose#_python
+
 # Возможные темы для минимального обязательного выполнения
 - "шаблон" без всякого лишнего, который можно использовать: [clean_bot_template.py](clean_bot_template.py)
 - предлагаю выбрать любое открытое API из списка [public-apis](https://github.com/public-apis/public-apis)
