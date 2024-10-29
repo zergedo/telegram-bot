@@ -56,7 +56,6 @@ reply_keyboard = [
 ]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Начать разговор и представить варианты выбора."""
     user = update.message.from_user
@@ -69,40 +68,44 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     return CHOOSING
 
-
 async def choose_joke(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Выбор шутки из выбранной категории."""
     category = update.message.text
     if category in jokes:
         joke = random.choice(jokes[category])
-        await update.message.reply_text(f"Внимание, анекдот: {joke}")
+        await update.message.reply_text(f"Внимание, анекдот: {joke}", reply_markup=markup)
     elif category == "Добавить в избранное":
-        await update.message.reply_text("Выберите мою великолепную шутку, которая не оставила вас равнодущным (добавить в избранное).")
+        await update.message.reply_text("Выберите шутку, которую хотите добавить в избранное.", reply_markup=markup)
         return FAVORITE
     elif category == "Показать избранное":
-        await update.message.reply_text("Мои лучщие анекдоты:\n" + "\n".join(favorite_jokes) if favorite_jokes else "У вас пока нет любимых анекдотов, грустный вы человек:(")
+        await update.message.reply_text(
+            "Мои лучшие анекдоты:\n" + "\n".join(favorite_jokes) if favorite_jokes else "У вас пока нет любимых анекдотов, грустный вы человек:(", 
+            reply_markup=markup
+        )
     
     return CHOOSING
-
 
 async def add_to_favorites(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Добавление шутки в избранное."""
     joke = update.message.text
     favorite_jokes.append(joke)
-    await update.message.reply_text(f"Идеальное дополнение к коллекции: {joke}")
+    await update.message.reply_text(f"Идеальное дополнение к коллекции: {joke}", reply_markup=markup)
     return CHOOSING
-
 
 async def done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Завершить разговор."""
     await update.message.reply_text("Я ещё многое мог, но доказать мне не дали...", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
-
 def main() -> None:
     """Запуск бота."""
     persistence = PicklePersistence(filepath="data/data", single_file=False)
     application = Application.builder().token("8122266381:AAGY-nR2Z5hyCUKK52or4jCO0BwSIswZOwg").persistence(persistence).build()
+
+    bot_commands = [
+        BotCommand("start", "Начало работы с ботом"),
+    ]
+    application.bot.set_my_commands(bot_commands)
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
@@ -119,16 +122,7 @@ def main() -> None:
 
     application.add_handler(conv_handler)
 
-    async def post_init(application: Application) -> None:
-        bot_commands = [
-            BotCommand("start", "Начало работы с ботом"),
-        ]
-        await application.bot.set_my_commands(bot_commands)
-
-    application.post_init(post_init)
-
     application.run_polling(allowed_updates=Update.ALL_TYPES)
-
 
 if __name__ == "__main__":
     main()
