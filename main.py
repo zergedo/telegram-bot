@@ -73,14 +73,18 @@ async def choose_joke(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     category = update.message.text
     if category in jokes:
         joke = random.choice(jokes[category])
-        await update.message.reply_text(f"Внимание, анекдот: {joke}", reply_markup=markup)
+        context.user_data['last_joke'] = joke  
+        await update.message.reply_text(f"{joke}")
     elif category == "Добавить в избранное":
-        await update.message.reply_text("Выберите шутку, которую хотите добавить в избранное.", reply_markup=markup)
-        return FAVORITE
+        last_joke = context.user_data.get('last_joke') 
+        if last_joke:
+            favorite_jokes.append(last_joke)
+            await update.message.reply_text(f"Идеальное дополнение к коллекции: {last_joke}")
+        else:
+            await update.message.reply_text("Сначала выберите анекдот, чтобы добавить его в избранное.")
     elif category == "Показать избранное":
         await update.message.reply_text(
-            "Мои лучшие анекдоты:\n" + "\n".join(favorite_jokes) if favorite_jokes else "У вас пока нет любимых анекдотов, грустный вы человек:(", 
-            reply_markup=markup
+            "Мои лучшие анекдоты:\n" + "\n".join(favorite_jokes) if favorite_jokes else "У вас пока нет любимых анекдотов, грустный вы человек:("
         )
     
     return CHOOSING
