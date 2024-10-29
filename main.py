@@ -51,7 +51,7 @@ jokes = {
 favorite_jokes: List[str] = []
 
 reply_keyboard = [
-    ["Шутки про Штирлица", "Шутки про программистов", "Шутки про студентов"],
+    ["Шутки про Штирлица", "Шутки на разные темы", "Шутки про студентов"],
     ["Добавить в избранное", "Показать избранное", "Закончить"],
 ]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
