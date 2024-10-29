@@ -63,7 +63,7 @@ favorite_jokes: List[str] = []
 
 reply_keyboard = [
     ["Шутки про Штирлица", "Шутки на разные темы", "Шутки про студентов"],
-    ["Добавить в избранное", "Показать избранное", "Закончить"],
+    ["Добавить в избранное", "Показать избранное"],
 ]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
@@ -92,9 +92,9 @@ async def choose_joke(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         last_joke = context.user_data.get('last_joke')
         if last_joke and last_joke not in favorite_jokes:
             favorite_jokes.add(last_joke)
-            await update.message.reply_text(f"Анекдот добавлен в избранное: {last_joke}")
+            await update.message.reply_text(f"Отличный выбор: {last_joke}")
         else:
-            await update.message.reply_text("Вы не можете добавить этот анекдот в избранное или он уже там.")
+            await update.message.reply_text("Ты его уже добавлял, разве нет?")
     elif category == "Показать избранное":
         await update.message.reply_text("Мои лучшие анекдоты:\n" + "\n".join(favorite_jokes) if favorite_jokes else "У вас пока нет любимых анекдотов, грустный вы человек:(")
     
@@ -107,11 +107,6 @@ async def add_to_favorites(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await update.message.reply_text(f"Идеальное дополнение к коллекции: {joke}", reply_markup=markup)
     return CHOOSING
 
-async def done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Завершить разговор."""
-    await update.message.reply_text("Я ещё многое мог, но доказать мне не дали...", reply_markup=ReplyKeyboardRemove())
-    return ConversationHandler.END
-
 def main() -> None:
     """Запуск бота."""
     persistence = PicklePersistence(filepath="data/data", single_file=False)
@@ -123,17 +118,17 @@ def main() -> None:
     application.bot.set_my_commands(bot_commands)
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
-        states={
-            CHOOSING: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, choose_joke),
-            ],
-            FAVORITE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, add_to_favorites),
-            ],
-        },
-        fallbacks=[MessageHandler(filters.Regex("^Закончить$"), done)],
-    )
+    entry_points=[CommandHandler("start", start)],
+    states={
+        CHOOSING: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, choose_joke),
+        ],
+        FAVORITE: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, add_to_favorites),
+        ],
+    },
+    fallbacks=[],
+)
 
     application.add_handler(conv_handler)
 
