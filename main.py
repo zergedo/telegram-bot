@@ -5,6 +5,7 @@ import os
 import logging
 import random
 from typing import Dict, List
+from dotenv import load_dotenv
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, BotCommand
 from telegram.ext import (
@@ -16,6 +17,8 @@ from telegram.ext import (
     PicklePersistence,
     filters,
 )
+
+load_dotenv()
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -100,17 +103,11 @@ async def choose_joke(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     
     return CHOOSING
 
-async def add_to_favorites(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Добавление шутки в избранное."""
-    joke = update.message.text
-    favorite_jokes.append(joke)
-    await update.message.reply_text(f"Идеальное дополнение к коллекции: {joke}", reply_markup=markup)
-    return CHOOSING
-
 def main() -> None:
     """Запуск бота."""
     persistence = PicklePersistence(filepath="data/data", single_file=False)
-    application = Application.builder().token("8122266381:AAGY-nR2Z5hyCUKK52or4jCO0BwSIswZOwg").persistence(persistence).build()
+    token = os.getenv("TELEGRAM_BOT_TOKEN") 
+    application = Application.builder().token(token).persistence(persistence).build()
 
     bot_commands = [
         BotCommand("start", "Начало работы с ботом"),
@@ -122,9 +119,6 @@ def main() -> None:
     states={
         CHOOSING: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, choose_joke),
-        ],
-        FAVORITE: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, add_to_favorites),
         ],
     },
     fallbacks=[],
